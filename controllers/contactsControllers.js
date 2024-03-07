@@ -2,8 +2,13 @@ import contactsService from "../services/contactsServices.js";
 import HttpError from "../helpers/HttpError.js";
 
 export const getAllContacts = async (req, res, next) => {
+  const { page = 1, limit = 20, favorite } = req.query;
   try {
-    const contacts = await contactsService.listContacts();
+    const contacts = await contactsService.listContacts({
+      page,
+      limit,
+      favorite,
+    });
     res.status(200).json(contacts);
   } catch (error) {
     next(HttpError(500));
