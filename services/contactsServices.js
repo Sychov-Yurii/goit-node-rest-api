@@ -1,12 +1,19 @@
 import Contact from "../db/contact.js";
+import HttpError from "../helpers/HttpError.js";
 
 // Function to list all contacts
-async function listContacts() {
+async function listContacts({ page = 1, limit = 20, favorite } = {}) {
+  const skip = (page - 1) * limit;
+
+  const filter = favorite ? { favorite: favorite === "true" } : {};
+
   try {
-    const contacts = await Contact.find();
+    const contacts = await Contact.find(filter)
+      .skip(skip)
+      .limit(parseInt(limit));
     return contacts;
   } catch (error) {
-    console.error("Error reading contacts:", error);
+    throw HttpError(500, "Error reading contacts");
   }
 }
 
@@ -14,9 +21,12 @@ async function listContacts() {
 async function getContactById(contactId) {
   try {
     const contact = await Contact.findById(contactId);
+    if (!contact) {
+      throw HttpError(404, "Contact not found");
+    }
     return contact;
   } catch (error) {
-    console.error("Error getting contact by ID:", error);
+    throw HttpError(500, "Error getting contact by ID");
   }
 }
 
@@ -24,9 +34,12 @@ async function getContactById(contactId) {
 async function removeContact(contactId) {
   try {
     const contact = await Contact.findByIdAndDelete(contactId);
+    if (!contact) {
+      throw HttpError(404, "Contact not found");
+    }
     return contact;
   } catch (error) {
-    console.error("Error removing contact:", error);
+    throw HttpError(500, "Error removing contact");
   }
 }
 
@@ -37,7 +50,7 @@ async function addContact(name, email, phone) {
     await newContact.save();
     return newContact;
   } catch (error) {
-    console.error("Error adding contact:", error);
+    throw HttpError(500, "Error adding contact");
   }
 }
 
@@ -47,9 +60,12 @@ async function updateContact(id, updatedContact) {
     const contact = await Contact.findByIdAndUpdate(id, updatedContact, {
       new: true,
     });
+    if (!contact) {
+      throw HttpError(404, "Contact not found");
+    }
     return contact;
   } catch (error) {
-    console.error("Error updating contact:", error);
+    throw HttpError(500, "Error updating contact");
   }
 }
 
@@ -61,9 +77,12 @@ async function updateStatusContact(id, favorite) {
       { favorite },
       { new: true }
     );
+    if (!contact) {
+      throw HttpError(404, "Contact not found");
+    }
     return contact;
   } catch (error) {
-    console.error("Error updating contact status:", error);
+    throw HttpError(500, "Error updating contact status");
   }
 }
 

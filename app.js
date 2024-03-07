@@ -3,7 +3,10 @@ import morgan from "morgan";
 import cors from "cors";
 import mongoose from "mongoose";
 import contactsRouter from "./routes/contactsRouter.js";
+import usersRouter from "./routes/usersRouter.js";
 import dotenv from "dotenv";
+import HttpError from "./helpers/HttpError.js";
+import path from "path";
 
 dotenv.config();
 
@@ -23,10 +26,17 @@ app.use(morgan("tiny"));
 app.use(cors());
 app.use(express.json());
 
-app.use("/api/contacts", contactsRouter);
+// Creating a path to the folder with static files
+const publicDirectoryPath = path.join(path.resolve(), "public");
 
-app.use((_, res) => {
-  res.status(404).json({ message: "Route not found" });
+// Configuring Express to serve static files
+app.use(express.static(publicDirectoryPath));
+
+app.use("/api/contacts", contactsRouter);
+app.use("/users", usersRouter);
+
+app.use((_, res, next) => {
+  next(HttpError(404, "Route not found"));
 });
 
 app.use((err, req, res, next) => {
