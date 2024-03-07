@@ -68,3 +68,8 @@ export const updateSubscription = async (userId, subscription) => {
     subscription: user.subscription,
   };
 };
+
+export const updateUser = async (id, updateInfo) => {
+  const user = await User.findByIdAndUpdate(id, updateInfo, { new: true });
+  return user;
+};

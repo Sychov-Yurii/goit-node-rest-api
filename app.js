@@ -6,6 +6,7 @@ import contactsRouter from "./routes/contactsRouter.js";
 import usersRouter from "./routes/usersRouter.js";
 import dotenv from "dotenv";
 import HttpError from "./helpers/HttpError.js";
+import path from "path";
 
 dotenv.config();
 
@@ -24,6 +25,12 @@ mongoose
 app.use(morgan("tiny"));
 app.use(cors());
 app.use(express.json());
+
+// Creating a path to the folder with static files
+const publicDirectoryPath = path.join(path.resolve(), "public");
+
+// Configuring Express to serve static files
+app.use(express.static(publicDirectoryPath));
 
 app.use("/api/contacts", contactsRouter);
 app.use("/users", usersRouter);
