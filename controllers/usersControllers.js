@@ -51,8 +51,11 @@ export const logout = async (req, res, next) => {
 
 export const getCurrentUser = async (req, res, next) => {
   try {
-    const user = await usersService.getCurrentUser(req.user._id);
-    res.status(200).json(user);
+    if (!req.user) {
+      next(HttpError(401, "Not authorized"));
+    } else {
+      res.status(200).json(req.user);
+    }
   } catch (error) {
     next(HttpError(401, "Not authorized"));
   }
