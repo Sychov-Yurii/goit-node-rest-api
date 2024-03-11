@@ -52,14 +52,21 @@ export const createContact = async (req, res, next) => {
 
 export const updateContact = async (req, res, next) => {
   try {
-    const contact = await contactsService.updateContact(
-      req.params.id,
-      req.body
-    );
-    if (contact) {
-      res.status(200).json(contact);
-    } else {
+    const contact = await contactsService.getContactById(req.params.id);
+    if (!contact) {
       next(HttpError(404, "Contact not found"));
+    } else if (contact.owner.toString() !== req.user._id.toString()) {
+      next(HttpError(403, "Forbidden"));
+    } else {
+      const updatedContact = await contactsService.updateContact(
+        req.params.id,
+        req.body
+      );
+      if (updatedContact) {
+        res.status(200).json(updatedContact);
+      } else {
+        next(HttpError(404, "Contact not found"));
+      }
     }
   } catch (error) {
     next(HttpError(400, error.message));
