@@ -9,10 +9,11 @@ export const registerUser = async (
   avatarURL,
   verificationToken
 ) => {
-  const candidate = await User.findOne({ email });
-  if (candidate) {
-    throw new Error("Email in use");
+  const existingUser = await User.findOne({ email });
+  if (existingUser) {
+    throw HttpError(409, "Email in use");
   }
+
   const hashedPassword = await bcrypt.hash(password, 10);
   const user = new User({
     email,
@@ -21,7 +22,8 @@ export const registerUser = async (
     verificationToken,
   });
   await user.save();
-  return user;
+
+  return { email, subscription: user.subscription };
 };
 
 export const loginUser = async (email, password) => {
