@@ -3,25 +3,17 @@ import jwt from "jsonwebtoken";
 import User from "../db/user.js";
 import HttpError from "../helpers/HttpError.js";
 
-export const registerUser = async (
-  email,
-  password,
-  avatarURL,
-  verificationToken
-) => {
-  const candidate = await User.findOne({ email });
-  if (candidate) {
-    throw new Error("Email in use");
+export const registerUser = async (email, password) => {
+  const existingUser = await User.findOne({ email });
+  if (existingUser) {
+    throw HttpError(409, "Email in use");
   }
+
   const hashedPassword = await bcrypt.hash(password, 10);
-  const user = new User({
-    email,
-    password: hashedPassword,
-    avatarURL,
-    verificationToken,
-  });
+  const user = new User({ email, password: hashedPassword });
   await user.save();
-  return user;
+
+  return { email, subscription: user.subscription };
 };
 
 export const loginUser = async (email, password) => {
@@ -75,22 +67,4 @@ export const updateSubscription = async (userId, subscription) => {
     email: user.email,
     subscription: user.subscription,
   };
-};
-
-export const updateUser = async (id, updateInfo) => {
-  const user = await User.findByIdAndUpdate(id, updateInfo, { new: true });
-  return user;
-};
-
-export const findUserByEmail = async (email) => {
-  return await User.findOne({ email });
-};
-
-export const verifyUser = async (Token) => {
-  const user = await User.findOneAndUpdate(
-    { verificationToken: Token },
-    { verify: true, verificationToken: "" },
-    { new: true }
-  );
-  return user;
 };
