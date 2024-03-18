@@ -1,7 +1,6 @@
-import Contact from "../db/contact.js";
+import Contact from "../db/contacts.js";
 import HttpError from "../helpers/HttpError.js";
 
-// Function to list all contacts
 async function listContacts({ page = 1, limit = 20, favorite } = {}) {
   const skip = (page - 1) * limit;
 
@@ -17,7 +16,6 @@ async function listContacts({ page = 1, limit = 20, favorite } = {}) {
   }
 }
 
-// Function to get a contact by ID
 async function getContactById(contactId) {
   try {
     const contact = await Contact.findById(contactId);
@@ -30,7 +28,6 @@ async function getContactById(contactId) {
   }
 }
 
-// Function to remove a contact by ID
 async function removeContact(contactId) {
   try {
     const contact = await Contact.findByIdAndDelete(contactId);
@@ -43,7 +40,6 @@ async function removeContact(contactId) {
   }
 }
 
-// Function to add a new contact
 async function addContact(name, email, phone) {
   try {
     const newContact = new Contact({ name, email, phone });
@@ -54,7 +50,6 @@ async function addContact(name, email, phone) {
   }
 }
 
-// Function to update a contact by ID
 async function updateContact(id, updatedContact) {
   try {
     const contact = await Contact.findByIdAndUpdate(id, updatedContact, {
@@ -69,7 +64,6 @@ async function updateContact(id, updatedContact) {
   }
 }
 
-// Function to update the 'favorite' status of a contact by ID
 async function updateStatusContact(id, favorite) {
   try {
     const contact = await Contact.findByIdAndUpdate(
