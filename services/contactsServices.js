@@ -1,10 +1,11 @@
 import Contact from "../db/contacts.js";
 import HttpError from "../helpers/HttpError.js";
 
-async function listContacts({ page = 1, limit = 20, favorite } = {}) {
+async function listContacts({ page = 1, limit = 20, favorite, owner } = {}) {
   const skip = (page - 1) * limit;
-
-  const filter = favorite ? { favorite: favorite === "true" } : {};
+  const filter = favorite
+    ? { favorite: true, ownerId: owner }
+    : { ownerId: owner };
 
   try {
     const contacts = await Contact.find(filter)
@@ -40,9 +41,9 @@ async function removeContact(contactId) {
   }
 }
 
-async function addContact(name, email, phone) {
+async function addContact({ name, email, phone }, ownerId) {
   try {
-    const newContact = new Contact({ name, email, phone });
+    const newContact = new Contact({ name, email, phone, ownerId });
     await newContact.save();
     return newContact;
   } catch (error) {
