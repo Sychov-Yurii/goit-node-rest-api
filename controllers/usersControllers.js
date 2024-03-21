@@ -1,5 +1,4 @@
 import * as usersService from "../services/usersServices.js";
-import HttpError from "../helpers/HttpError.js";
 
 export const register = async (req, res, next) => {
   const { email, password } = req.body;
@@ -37,6 +36,8 @@ export const logout = async (req, res, next) => {
 
 export const getCurrentUser = async (req, res, next) => {
   try {
+    console.log(req.user);
+    console.log(req.user._id);
     if (!req.user || !req.user._id) {
       throw new Error("User not authorized");
     }

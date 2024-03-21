@@ -1,7 +1,6 @@
 import mongoose from "mongoose";
 
 const { Schema } = mongoose;
-
 const contactSchema = new Schema({
   name: {
     type: String,
@@ -17,9 +16,9 @@ const contactSchema = new Schema({
     type: Boolean,
     default: false,
   },
-  owner: {
+  ownerId: {
     type: Schema.Types.ObjectId,
-    ref: "User",
+    ref: "users",
   },
 });
 

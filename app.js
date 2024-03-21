@@ -3,19 +3,17 @@ import morgan from "morgan";
 import cors from "cors";
 import mongoose from "mongoose";
 import contactsRouter from "./routes/contactsRouter.js";
-import dotenv from "dotenv";
 import usersRouter from "./routes/usersRouter.js";
+import authMiddleware from "./middlewares/authMiddleware.js";
 
-dotenv.config();
 const app = express();
-
-const { DB_URI = "mongodb://localhost:3000", PORT = 3000 } = process.env;
+const DB_URI = process.env.DB_URI;
 
 mongoose
   .connect(DB_URI)
   .then(() => {
-    app.listen(PORT, () => {
-      console.log(`Server is running. Use our API on port:3000`);
+    app.listen(8080, () => {
+      console.log(`Server is running. Use our API on port:8080`);
       console.log(`Database connection successful.`);
     });
   })
@@ -29,7 +27,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/api/users", usersRouter);
-app.use("/api/contacts", contactsRouter);
+app.use("/api/contacts", authMiddleware, contactsRouter);
 
 app.use((_, res) => {
   res.status(404).json({ message: "Route not found" });
